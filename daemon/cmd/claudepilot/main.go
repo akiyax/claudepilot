@@ -116,6 +116,11 @@ func run() error {
 	h := handler.NewHandler(tp, cfg.DaemonID, Version)
 	h.SetCLIVersion(cliVersion)
 
+	// Init provider manager
+	if err := h.InitProviderManager(); err != nil {
+		slog.Warn("Provider manager init failed", "err", err)
+	}
+
 	// Register message handler
 	tp.OnMessage(func(msg claude.WSMessage) {
 		h.HandleMessage(msg)

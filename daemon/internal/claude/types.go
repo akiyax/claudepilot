@@ -422,13 +422,173 @@ type EffortSwitchPayload struct {
 	Effort string `json:"effort"`
 }
 
+// PlanApprovePayload approves or rejects a plan.
+type PlanApprovePayload struct {
+	Approved bool   `json:"approved"`
+	PlanID   string `json:"planId,omitempty"`
+}
+
+// ─── List request/response payloads ──────────────────────
+
+// SessionListPayload requests session list.
+type SessionListPayload struct {
+	ProjectDir string `json:"projectDir,omitempty"`
+	GroupBy    string `json:"groupBy,omitempty"` // "workspace" or "timeline"
+}
+
+// SessionSwitchPayload switches/resumes a session.
+type SessionSwitchPayload struct {
+	SessionID string `json:"sessionId"`
+}
+
+// AgentListPayload requests agent list.
+type AgentListPayload struct {
+	ProjectDir string `json:"projectDir,omitempty"`
+}
+
+// AgentGetPayload requests a single agent detail.
+type AgentGetPayload struct {
+	Name       string `json:"name"`
+	ProjectDir string `json:"projectDir,omitempty"`
+}
+
+// AgentCreatePayload creates a new agent.
+type AgentCreatePayload struct {
+	Name            string   `json:"name"`
+	Description     string   `json:"description,omitempty"`
+	Prompt          string   `json:"prompt"`
+	Model           string   `json:"model,omitempty"`
+	Tools           []string `json:"tools,omitempty"`
+	DisallowedTools []string `json:"disallowedTools,omitempty"`
+	PermissionMode  string   `json:"permissionMode,omitempty"`
+	Effort          string   `json:"effort,omitempty"`
+	MaxTurns        int      `json:"maxTurns,omitempty"`
+	Memory          string   `json:"memory,omitempty"`
+	Color           string   `json:"color,omitempty"`
+	InitialPrompt   string   `json:"initialPrompt,omitempty"`
+	Isolation       string   `json:"isolation,omitempty"`
+	Background      bool     `json:"background,omitempty"`
+	ProjectDir      string   `json:"projectDir,omitempty"`
+}
+
+// AgentUpdatePayload updates an existing agent.
+type AgentUpdatePayload struct {
+	Name            string   `json:"name"`
+	ProjectDir      string   `json:"projectDir,omitempty"`
+	Description     string   `json:"description,omitempty"`
+	Prompt          string   `json:"prompt,omitempty"`
+	Model           string   `json:"model,omitempty"`
+	Tools           []string `json:"tools,omitempty"`
+	DisallowedTools []string `json:"disallowedTools,omitempty"`
+	PermissionMode  string   `json:"permissionMode,omitempty"`
+	Effort          string   `json:"effort,omitempty"`
+	MaxTurns        int      `json:"maxTurns,omitempty"`
+	Memory          string   `json:"memory,omitempty"`
+	Color           string   `json:"color,omitempty"`
+	InitialPrompt   string   `json:"initialPrompt,omitempty"`
+	Isolation       string   `json:"isolation,omitempty"`
+	Background      *bool    `json:"background,omitempty"` // pointer to distinguish false from unset
+}
+
+// AgentDeletePayload deletes an agent.
+type AgentDeletePayload struct {
+	Name       string `json:"name"`
+	ProjectDir string `json:"projectDir,omitempty"`
+}
+
+// ProviderAddPayload adds a new provider.
+type ProviderAddPayload struct {
+	Name    string `json:"name"`
+	APIKey  string `json:"apiKey"`
+	BaseURL string `json:"baseUrl,omitempty"`
+	Model   string `json:"model,omitempty"`
+}
+
+// ProviderRemovePayload removes a provider.
+type ProviderRemovePayload struct {
+	Name string `json:"name"`
+}
+
+// ProviderSwitchPayload switches the active provider.
+type ProviderSwitchPayload struct {
+	Name string `json:"name"`
+}
+
 // ModeSwitchPayload switches the permission mode.
 type ModeSwitchPayload struct {
 	Mode string `json:"mode"`
 }
 
-// PlanApprovePayload approves or rejects a plan.
-type PlanApprovePayload struct {
-	Approved bool   `json:"approved"`
-	PlanID   string `json:"planId,omitempty"`
+// SessionListResultPayload is the response for session.list.
+type SessionListResultPayload struct {
+	Sessions []SessionItem `json:"sessions"`
+}
+
+// SessionItem is a single session in the list result.
+type SessionItem struct {
+	ID           string `json:"id"`
+	ProjectDir   string `json:"projectDir,omitempty"`
+	Summary      string `json:"summary"`
+	MessageCount int    `json:"messageCount"`
+	ModifiedAt   int64  `json:"modifiedAt"` // Unix timestamp
+}
+
+// SessionHistoryResultPayload is the response for session.history.
+type SessionHistoryResultPayload struct {
+	Messages []HistoryMessage `json:"messages"`
+}
+
+// HistoryMessage is a single message in session history.
+type HistoryMessage struct {
+	Type      string `json:"type"` // "user" or "assistant"
+	Content   string `json:"content"`
+	Timestamp int64  `json:"timestamp"` // Unix timestamp
+}
+
+// AgentListResultPayload is the response for agent.list.
+type AgentListResultPayload struct {
+	Agents []AgentItem `json:"agents"`
+}
+
+// AgentItem is a single agent in the list result.
+type AgentItem struct {
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Model       string `json:"model,omitempty"`
+	Color       string `json:"color,omitempty"`
+	Source      string `json:"source"` // "user" or "project"
+}
+
+// AgentGetResultPayload is the response for agent.get.
+type AgentGetResultPayload struct {
+	Name            string   `json:"name"`
+	Description     string   `json:"description"`
+	Model           string   `json:"model,omitempty"`
+	Color           string   `json:"color,omitempty"`
+	Source          string   `json:"source"`
+	Tools           []string `json:"tools,omitempty"`
+	DisallowedTools []string `json:"disallowedTools,omitempty"`
+	PermissionMode  string   `json:"permissionMode,omitempty"`
+	Effort          string   `json:"effort,omitempty"`
+	MaxTurns        int      `json:"maxTurns,omitempty"`
+	Memory          string   `json:"memory,omitempty"`
+	InitialPrompt   string   `json:"initialPrompt,omitempty"`
+	Isolation       string   `json:"isolation,omitempty"`
+	Background      bool     `json:"background,omitempty"`
+	Prompt          string   `json:"prompt"`
+}
+
+// ProviderListResultPayload is the response for provider.list.
+type ProviderListResultPayload struct {
+	Providers []ProviderItem `json:"providers"`
+	Active    string         `json:"active"`
+}
+
+// ProviderItem is a single provider in the list result.
+type ProviderItem struct {
+	Name      string `json:"name"`
+	IsDefault bool   `json:"isDefault"`
+	BaseURL   string `json:"baseUrl,omitempty"`
+	Model     string `json:"model,omitempty"`
+	// Note: API key is never sent to APP
 }
