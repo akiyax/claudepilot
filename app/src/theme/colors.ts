@@ -113,10 +113,10 @@ export const DarkColors = {
 
 // ─── Theme Type ──────────────────────────────────────────
 
-export type ThemeColors = typeof LightColors;
+export type ThemeColors = typeof LightColors | typeof DarkColors;
 
 export interface Theme {
-  colors: ThemeColors;
+  colors: typeof LightColors | typeof DarkColors;
   isDark: boolean;
 }
 
@@ -128,3 +128,36 @@ export function createTheme(isDark: boolean): Theme {
     isDark,
   };
 }
+
+// ─── Convenience flat colors for StyleSheet usage ─────────
+// These provide quick access for light mode (default).
+// For dark mode, use createTheme() with a React context.
+
+export const colors = {
+  light: {
+    primary: Brand.primary,
+    background: LightColors.background,
+    card: LightColors.surface,
+    border: LightColors.surfaceBorder,
+    textPrimary: LightColors.textPrimary,
+    textSecondary: LightColors.textSecondary,
+    textTertiary: LightColors.textTertiary,
+    userBubble: LightColors.userBubble,
+    assistantBubble: LightColors.surface,
+    success: '#34C759',
+    error: '#FF3B30',
+  },
+  dark: {
+    primary: Brand.primaryLight,
+    background: DarkColors.background,
+    card: DarkColors.surface,
+    border: DarkColors.surfaceBorder,
+    textPrimary: DarkColors.textPrimary,
+    textSecondary: DarkColors.textSecondary,
+    textTertiary: DarkColors.textTertiary,
+    userBubble: DarkColors.userBubble,
+    assistantBubble: DarkColors.surface,
+    success: '#30D158',
+    error: '#FF453A',
+  },
+} as const;
