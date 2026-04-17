@@ -19,6 +19,7 @@ i18n.use(initReactI18next).init({
   resources,
   lng: defaultLang,
   fallbackLng: 'en',
+  compatibilityJSON: 'v4',
   interpolation: {
     escapeValue: false,
   },

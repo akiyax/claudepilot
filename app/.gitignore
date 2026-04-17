@@ -1,2 +1,34 @@
+# Dependencies
 node_modules/
-*.lock
+
+# iOS
+ios/Pods/
+ios/build/
+*.xcworkspace
+*.xcuserdata
+
+# Android
+android/.gradle/
+android/app/build/
+android/build/
+
+# Metro
+.metro-health-check*
+
+# Bundle
+*.jsbundle
+
+# Debug
+npm-debug.log*
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+coverage/
