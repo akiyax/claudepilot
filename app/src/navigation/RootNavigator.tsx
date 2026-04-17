@@ -3,9 +3,13 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useConnectionStore } from '../stores/connectionStore';
 import { useChatStore } from '../stores/chatStore';
+import { useAgentStore } from '../stores/agentStore';
+import { useSessionStore } from '../stores/sessionStore';
+import { wsService } from '../services/WebSocketService';
 import ConnectionScreen from '../screens/ConnectionScreen';
 import MainTabs from './MainTabs';
 import type { WSMessage } from '../types/ws';
+import type { AgentItem, SessionItem, HistoryMessage } from '../types/ws';
 
 export type RootStackParamList = {
   Connection: undefined;
@@ -14,33 +18,52 @@ export type RootStackParamList = {
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
+// Unified WS message dispatcher — routes to all stores
+function dispatchWSMessage(msg: WSMessage) {
+  // Connection store
+  useConnectionStore.getState().handleMessage(msg);
+
+  // Chat store
+  useChatStore.getState().handleWSMessage(msg);
+
+  // Agent store
+  if (msg.type === 'agent.list.result' && msg.payload) {
+    useAgentStore.getState().handleAgentListResult(msg.payload.agents as AgentItem[]);
+  }
+
+  // Session store
+  if (msg.type === 'session.list.result' && msg.payload) {
+    useSessionStore.getState().handleSessionListResult(msg.payload.sessions as SessionItem[]);
+  }
+  if (msg.type === 'session.history.result' && msg.payload) {
+    useSessionStore.getState().handleSessionHistoryResult(msg.payload.messages as HistoryMessage[]);
+  }
+  if (msg.type === 'session.updated') {
+    useSessionStore.getState().fetchSessions();
+  }
+}
+
 export default function RootNavigator() {
   const { connection, loadSavedConnection } = useConnectionStore();
-  const { handleWSMessage } = useChatStore();
 
-  // Route WS messages to appropriate stores
+  // Set up WS message routing
   useEffect(() => {
-    const { handleMessage: handleConnectionMsg } = useConnectionStore.getState();
+    wsService.onMessage(dispatchWSMessage);
+    return () => { wsService.onMessage(() => {}); };
+  }, []);
 
-    // Set up unified WS message handler
-    const originalOnMessage = (msg: WSMessage) => {
-      handleConnectionMsg(msg);
-      handleWSMessage(msg);
-    };
-
-    // Replace the WS handler with our unified one
-    const ws = require('../services/WebSocketService').wsService;
-    ws.onMessage(originalOnMessage);
-
-    return () => {
-      ws.onMessage(() => {});
-    };
-  }, [handleWSMessage]);
-
-  // Load saved connection on mount
+  // Auto-reconnect on mount
   useEffect(() => {
     loadSavedConnection();
   }, [loadSavedConnection]);
+
+  // Fetch initial data when connected
+  useEffect(() => {
+    if (connection.connected) {
+      useAgentStore.getState().fetchAgents();
+      useSessionStore.getState().fetchSessions();
+    }
+  }, [connection.connected]);
 
   return (
     <NavigationContainer>

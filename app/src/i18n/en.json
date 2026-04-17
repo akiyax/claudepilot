@@ -1,0 +1,84 @@
+{
+  "app_name": "ClaudePilot",
+  "subtitle": "Remote Control for Claude Code",
+
+  "connection": {
+    "pairCode": "Pair Code",
+    "manual": "Manual",
+    "hostIP": "Computer IP",
+    "port": "Port",
+    "pairCodeHint": "6-digit code",
+    "hint": "Run claudepilot on your computer to see the pairing code",
+    "connect": "Connect",
+    "connecting": "Connecting...",
+    "scanQR": "Scan QR",
+    "pairHint": "Get the code from your computer terminal"
+  },
+
+  "chat": {
+    "newConversation": "New Chat",
+    "startHint": "Send a message to start chatting with Claude",
+    "newSession": "New Session",
+    "inputPlaceholder": "Type a message...",
+    "thinking": "Thinking...",
+    "thought": "Thought",
+    "permissionTitle": "Permission Request",
+    "allow": "Allow",
+    "deny": "Deny",
+    "newMessages": "{{count}} new messages"
+  },
+
+  "tabs": {
+    "chat": "Chat",
+    "sessions": "Sessions",
+    "agents": "Agents",
+    "settings": "Settings"
+  },
+
+  "session": {
+    "title": "Sessions",
+    "empty": "No Sessions",
+    "emptyHint": "Start a new session from the Chat tab",
+    "messages": "{{count}} messages",
+    "justNow": "just now",
+    "minutesAgo": "{{count}}m ago",
+    "hoursAgo": "{{count}}h ago",
+    "daysAgo": "{{count}}d ago",
+    "delete": "Delete Session",
+    "deleteConfirm": "Delete \"{{name}}\"? This cannot be undone.",
+    "cancel": "Cancel"
+  },
+
+  "agent": {
+    "title": "Agents",
+    "empty": "No Agents",
+    "emptyHint": "Create agent files in ~/.claude/agents/ on your computer",
+    "project": "Project",
+    "model": "Model: {{model}}",
+    "noDesc": "No description",
+    "delete": "Delete Agent",
+    "deleteConfirm": "Delete \"{{name}}\"?"
+  },
+
+  "settings": {
+    "connectionInfo": "Connection Info",
+    "status": "Status",
+    "connected": "Connected",
+    "disconnected": "Disconnected",
+    "daemonVersion": "Daemon Version",
+    "cliVersion": "CLI Version",
+    "daemonId": "Daemon ID",
+    "disconnect": "Disconnect"
+  },
+
+  "common": {
+    "alert": "Notice",
+    "output": "Output:",
+    "emptySession": "(Empty session)",
+    "delete": "Delete",
+    "manualInDev": "Manual input is in development...",
+    "pairCodeRequired": "Please enter a 6-digit pair code",
+    "hostIPRequired": "Please enter the computer IP address",
+    "connectFailed": "Connection failed"
+  }
+}

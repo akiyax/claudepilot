@@ -37,7 +37,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
   activeToolCalls: new Map(),
   permissionRequest: null,
   questionRequest: null,
-  sessionTitle: '新对话',
+  sessionTitle: '',
   contextUsage: { inputTokens: 0, outputTokens: 0, totalTokens: 0, contextWindow: 0, usedPercent: 0 },
   currentSession: null,
   sessionId: null,
@@ -171,7 +171,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
       }
 
       case 'session.title': {
-        set({ sessionTitle: msg.payload?.title || '新对话' });
+        set({ sessionTitle: msg.payload?.title || '' });
         break;
       }
 
@@ -191,7 +191,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
       activeToolCalls: new Map(),
       permissionRequest: null,
       questionRequest: null,
-      sessionTitle: '新对话',
+      sessionTitle: '',
       currentSession: config,
     });
     wsService.send('session.start', config);

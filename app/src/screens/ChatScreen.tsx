@@ -10,15 +10,21 @@ import {
   Platform,
   ActivityIndicator,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { useChatStore } from '../stores/chatStore';
 import { useConnectionStore } from '../stores/connectionStore';
-import { colors } from '../theme/colors';
+import { useTheme } from '../hooks/useTheme';
+import ThinkingPanel from '../components/ThinkingPanel';
+import ToolCallCard from '../components/ToolCallCard';
+import ContextUsageBar from '../components/ContextUsageBar';
 import type { ChatMessage } from '../types/models';
 
 export default function ChatScreen() {
   const {
     messages,
     isStreaming,
+    currentThinkingText,
+    activeToolCalls,
     permissionRequest,
     sessionTitle,
     contextUsage,
@@ -28,6 +34,10 @@ export default function ChatScreen() {
   } = useChatStore();
 
   const { cliVersion } = useConnectionStore();
+  const { theme } = useTheme();
+  const { t } = useTranslation();
+  const c = theme.colors;
+
   const [inputText, setInputText] = useState('');
   const flatListRef = useRef<FlatList>(null);
   const [showNewMessage, setShowNewMessage] = useState(false);
@@ -49,12 +59,17 @@ export default function ChatScreen() {
     const isUser = item.type === 'user';
     return (
       <View style={[styles.messageRow, isUser ? styles.userRow : styles.assistantRow]}>
-        <View style={[styles.messageBubble, isUser ? styles.userBubble : styles.assistantBubble]}>
-          <Text style={[styles.messageText, isUser ? styles.userText : styles.assistantText]}>
+        <View style={[
+          styles.messageBubble,
+          isUser
+            ? { backgroundColor: c.userBubble }
+            : { backgroundColor: c.assistantBubble, borderColor: c.assistantBubbleBorder, borderWidth: 1 },
+        ]}>
+          <Text style={[styles.messageText, { color: c.textPrimary }]}>
             {item.content}
           </Text>
           {item.isStreaming && (
-            <Text style={styles.streamingCursor}>▊</Text>
+            <Text style={[styles.streamingCursor, { color: Brand.primary }]}>▊</Text>
           )}
         </View>
       </View>
@@ -65,28 +80,30 @@ export default function ChatScreen() {
   const renderPermissionSheet = () => {
     if (!permissionRequest) return null;
     return (
-      <View style={styles.permissionSheet}>
-        <Text style={styles.permissionTitle}>权限请求</Text>
-        <Text style={styles.permissionTool}>
+      <View style={[styles.permissionSheet, { backgroundColor: c.surface, borderColor: c.surfaceBorder }]}>
+        <Text style={[styles.permissionTitle, { color: c.textPrimary }]}>
+          {t('chat.permissionTitle')}
+        </Text>
+        <Text style={[styles.permissionTool, { color: Brand.primary }]}>
           {permissionRequest.toolName}
         </Text>
         {permissionRequest.displayText && (
-          <Text style={styles.permissionDesc}>
+          <Text style={[styles.permissionDesc, { color: c.textSecondary }]}>
             {permissionRequest.displayText}
           </Text>
         )}
         <View style={styles.permissionButtons}>
           <TouchableOpacity
-            style={[styles.permButton, styles.denyButton]}
+            style={[styles.permButton, { backgroundColor: c.error + '20', borderColor: c.error, borderWidth: 1 }]}
             onPress={() => respondPermission(permissionRequest.requestId, 'deny')}
           >
-            <Text style={styles.denyButtonText}>拒绝</Text>
+            <Text style={[styles.denyButtonText, { color: c.error }]}>{t('chat.deny')}</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.permButton, styles.allowButton]}
+            style={[styles.permButton, { backgroundColor: Brand.primary }]}
             onPress={() => respondPermission(permissionRequest.requestId, 'allow')}
           >
-            <Text style={styles.allowButtonText}>允许</Text>
+            <Text style={styles.allowButtonText}>{t('chat.allow')}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -95,17 +112,15 @@ export default function ChatScreen() {
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={[styles.container, { backgroundColor: c.background }]}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       keyboardVerticalOffset={90}
     >
       {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>{sessionTitle}</Text>
+      <View style={[styles.header, { borderBottomColor: c.surfaceBorder, backgroundColor: c.surface }]}>
+        <Text style={[styles.headerTitle, { color: c.textPrimary }]}>{sessionTitle || t('chat.newConversation')}</Text>
         {contextUsage.contextWindow > 0 && (
-          <Text style={styles.contextUsage}>
-            {Math.round(contextUsage.totalTokens / 1000)}k/{Math.round(contextUsage.contextWindow / 1000)}k
-          </Text>
+          <ContextUsageBar usage={contextUsage} />
         )}
       </View>
 
@@ -122,29 +137,39 @@ export default function ChatScreen() {
         }}
         ListEmptyComponent={
           <View style={styles.emptyState}>
-            <Text style={styles.emptyTitle}>开始新对话</Text>
-            <Text style={styles.emptyHint}>
-              发送消息开始与 Claude 对话
+            <Text style={[styles.emptyTitle, { color: c.textPrimary }]}>{t('chat.newConversation')}</Text>
+            <Text style={[styles.emptyHint, { color: c.textTertiary }]}>
+              {t('chat.startHint')}
             </Text>
             <TouchableOpacity
-              style={styles.startButton}
+              style={[styles.startButton, { backgroundColor: Brand.primary }]}
               onPress={() => startSession({})}
             >
-              <Text style={styles.startButtonText}>新建会话</Text>
+              <Text style={styles.startButtonText}>{t('chat.newSession')}</Text>
             </TouchableOpacity>
           </View>
         }
       />
 
+      {/* Thinking Panel */}
+      {currentThinkingText && (
+        <ThinkingPanel content={currentThinkingText} isStreaming={isStreaming} />
+      )}
+
+      {/* Active Tool Calls */}
+      {Array.from(activeToolCalls.values()).map((tool) => (
+        <ToolCallCard key={tool.id} tool={tool} />
+      ))}
+
       {/* Permission Sheet */}
       {renderPermissionSheet()}
 
       {/* Input Bar */}
-      <View style={styles.inputBar}>
+      <View style={[styles.inputBar, { backgroundColor: c.surface, borderTopColor: c.surfaceBorder }]}>
         <TextInput
-          style={styles.textInput}
-          placeholder="输入消息..."
-          placeholderTextColor={colors.light.textTertiary}
+          style={[styles.textInput, { backgroundColor: c.background, color: c.textPrimary }]}
+          placeholder={t('chat.inputPlaceholder')}
+          placeholderTextColor={c.textTertiary}
           value={inputText}
           onChangeText={setInputText}
           multiline
@@ -152,7 +177,7 @@ export default function ChatScreen() {
           editable={!isStreaming}
         />
         <TouchableOpacity
-          style={[styles.sendButton, (!inputText.trim() || isStreaming) && styles.sendDisabled]}
+          style={[styles.sendButton, { backgroundColor: Brand.primary }, (!inputText.trim() || isStreaming) && styles.sendDisabled]}
           onPress={handleSend}
           disabled={!inputText.trim() || isStreaming}
         >
@@ -167,10 +192,11 @@ export default function ChatScreen() {
   );
 }
 
+import { Brand } from '../theme/colors';
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.light.background,
   },
   header: {
     flexDirection: 'row',
@@ -179,19 +205,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: colors.light.border,
-    backgroundColor: colors.light.card,
   },
   headerTitle: {
     fontSize: 17,
     fontWeight: '600',
-    color: colors.light.textPrimary,
     flex: 1,
-  },
-  contextUsage: {
-    fontSize: 12,
-    color: colors.light.textTertiary,
-    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
   },
   messageList: {
     flex: 1,
@@ -215,26 +233,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 10,
   },
-  userBubble: {
-    backgroundColor: colors.light.userBubble,
-  },
-  assistantBubble: {
-    backgroundColor: colors.light.assistantBubble,
-    borderWidth: 1,
-    borderColor: colors.light.border,
-  },
   messageText: {
     fontSize: 15,
     lineHeight: 22,
   },
-  userText: {
-    color: colors.light.textPrimary,
-  },
-  assistantText: {
-    color: colors.light.textPrimary,
-  },
   streamingCursor: {
-    color: colors.light.primary,
     fontSize: 14,
   },
   emptyState: {
@@ -246,16 +249,13 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 22,
     fontWeight: '700',
-    color: colors.light.textPrimary,
     marginBottom: 8,
   },
   emptyHint: {
     fontSize: 15,
-    color: colors.light.textTertiary,
     marginBottom: 24,
   },
   startButton: {
-    backgroundColor: colors.light.primary,
     borderRadius: 16,
     paddingHorizontal: 32,
     paddingVertical: 14,
@@ -266,29 +266,24 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   permissionSheet: {
-    backgroundColor: colors.light.card,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     padding: 20,
     borderWidth: 1,
-    borderColor: colors.light.border,
   },
   permissionTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: colors.light.textPrimary,
     marginBottom: 8,
   },
   permissionTool: {
     fontSize: 14,
     fontWeight: '600',
-    color: colors.light.primary,
     marginBottom: 4,
     fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
   },
   permissionDesc: {
     fontSize: 14,
-    color: colors.light.textSecondary,
     marginBottom: 16,
   },
   permissionButtons: {
@@ -301,16 +296,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
   },
-  denyButton: {
-    backgroundColor: colors.light.error + '20',
-    borderWidth: 1,
-    borderColor: colors.light.error,
-  },
-  allowButton: {
-    backgroundColor: colors.light.primary,
-  },
   denyButtonText: {
-    color: colors.light.error,
     fontWeight: '600',
     fontSize: 16,
   },
@@ -324,27 +310,22 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     paddingHorizontal: 12,
     paddingVertical: 8,
-    backgroundColor: colors.light.card,
     borderTopWidth: 1,
-    borderTopColor: colors.light.border,
     gap: 8,
   },
   textInput: {
     flex: 1,
     minHeight: 40,
     maxHeight: 120,
-    backgroundColor: colors.light.background,
     borderRadius: 20,
     paddingHorizontal: 16,
     paddingVertical: 10,
     fontSize: 16,
-    color: colors.light.textPrimary,
   },
   sendButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: colors.light.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },

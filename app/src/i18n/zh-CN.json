@@ -1,0 +1,84 @@
+{
+  "app_name": "ClaudePilot",
+  "subtitle": "远程控制 Claude Code",
+
+  "connection": {
+    "pairCode": "配对码",
+    "manual": "手动输入",
+    "hostIP": "电脑 IP 地址",
+    "port": "端口",
+    "pairCodeHint": "6 位数字",
+    "hint": "在电脑终端运行 claudepilot 查看配对码",
+    "connect": "连接",
+    "connecting": "连接中...",
+    "scanQR": "扫码连接",
+    "pairHint": "在电脑终端查看配对码后输入"
+  },
+
+  "chat": {
+    "newConversation": "新对话",
+    "startHint": "发送消息开始与 Claude 对话",
+    "newSession": "新建会话",
+    "inputPlaceholder": "输入消息...",
+    "thinking": "思考中...",
+    "thought": "已思考",
+    "permissionTitle": "权限请求",
+    "allow": "允许",
+    "deny": "拒绝",
+    "newMessages": "{{count}} 条新消息"
+  },
+
+  "tabs": {
+    "chat": "对话",
+    "sessions": "会话",
+    "agents": "Agent",
+    "settings": "设置"
+  },
+
+  "session": {
+    "title": "会话列表",
+    "empty": "暂无会话",
+    "emptyHint": "在对话页面发消息开始新会话",
+    "messages": "{{count}} 条消息",
+    "justNow": "刚刚",
+    "minutesAgo": "{{count}} 分钟前",
+    "hoursAgo": "{{count}} 小时前",
+    "daysAgo": "{{count}} 天前",
+    "delete": "删除会话",
+    "deleteConfirm": "确定要删除 \"{{name}}\" 吗？此操作不可撤销。",
+    "cancel": "取消"
+  },
+
+  "agent": {
+    "title": "Agent 列表",
+    "empty": "暂无 Agent",
+    "emptyHint": "在电脑端 ~/.claude/agents/ 目录创建 Agent 文件",
+    "project": "项目",
+    "model": "模型: {{model}}",
+    "noDesc": "无描述",
+    "delete": "删除 Agent",
+    "deleteConfirm": "确定要删除 \"{{name}}\" 吗？"
+  },
+
+  "settings": {
+    "connectionInfo": "连接信息",
+    "status": "状态",
+    "connected": "已连接",
+    "disconnected": "未连接",
+    "daemonVersion": "Daemon 版本",
+    "cliVersion": "CLI 版本",
+    "daemonId": "Daemon ID",
+    "disconnect": "断开连接"
+  },
+
+  "common": {
+    "alert": "提示",
+    "output": "输出:",
+    "emptySession": "(空会话)",
+    "delete": "删除",
+    "manualInDev": "手动输入功能开发中...",
+    "pairCodeRequired": "请输入 6 位配对码",
+    "hostIPRequired": "请输入电脑 IP 地址",
+    "connectFailed": "连接失败"
+  }
+}

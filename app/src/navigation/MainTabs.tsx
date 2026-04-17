@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import ChatScreen from '../screens/ChatScreen';
 import SessionListScreen from '../screens/SessionListScreen';
@@ -15,6 +16,8 @@ export type MainTabParamList = {
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
 export default function MainTabs() {
+  const { t } = useTranslation();
+
   return (
     <Tab.Navigator
       screenOptions={{
@@ -25,22 +28,22 @@ export default function MainTabs() {
       <Tab.Screen
         name="Chat"
         component={ChatScreen}
-        options={{ title: '对话', tabBarLabel: '对话' }}
+        options={{ title: t('tabs.chat'), tabBarLabel: t('tabs.chat') }}
       />
       <Tab.Screen
         name="Sessions"
         component={SessionListScreen}
-        options={{ title: '会话', tabBarLabel: '会话' }}
+        options={{ title: t('tabs.sessions'), tabBarLabel: t('tabs.sessions') }}
       />
       <Tab.Screen
         name="Agents"
         component={AgentListScreen}
-        options={{ title: 'Agent', tabBarLabel: 'Agent' }}
+        options={{ title: t('tabs.agents'), tabBarLabel: t('tabs.agents') }}
       />
       <Tab.Screen
         name="Settings"
         component={SettingsScreen}
-        options={{ title: '设置', tabBarLabel: '设置' }}
+        options={{ title: t('tabs.settings'), tabBarLabel: t('tabs.settings') }}
       />
     </Tab.Navigator>
   );
